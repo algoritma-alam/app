@@ -1,26 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-custom-controls';
-import { StyleSheet } from 'react-native'
+import { TouchableWithoutFeedback, PanResponder } from 'react-native'
 import Orientation from 'react-native-orientation';
 import { tailwind, getColor } from '@resources/tailwind'
-import { View, Text } from 'react-native'
+import { View, Text, Animated } from 'react-native'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { LinearGradient } from 'expo-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient';
 import BackButtonX from '@components/BackButtonX';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import { PlayButton, PauseButton } from '@resources/icons'
+import Draggable from 'react-native-draggable';
 
 export default function({ route, navigation }) {
+
+  const PLAYER_HIDE_TIMEOUT = 5000;
 
   const [ videoDuration, setVideoDuration ] = useState(0)
   const [ currentTime, setCurrentTime ] = useState(0)
   const [ playerControlShown, showPlayerControl ] = useState(false)
   const [ isPaused, pauseVideo ] = useState(false)
+  const [ videoPanActive, setVideoPanActive ] = useState(false)
 
   const { video: { video_url, title } } = route.params
 
+  // refs
+  const videoPan = useRef(new Animated.ValueXY()).current;
   const player = useRef()
+  const videoDurationRef = useRef()
+  const videoPlayerControlTimeout = useRef()
+
+  videoDurationRef.current = videoDuration
 
   const onBuffer = () => {
     console.log('buffering')
@@ -37,6 +46,18 @@ export default function({ route, navigation }) {
 
   const onVideoProgress = (meta) => {
     setCurrentTime(Math.ceil(meta.currentTime))
+
+    updateVideoPan()
+  }
+
+  const updateVideoPan = () => {
+
+    const position = (currentTime / videoDuration * 100)
+
+    const panXOffset = position / 100 * (hp(90) / hp(100) * hp(90))
+
+    videoPan.setOffset({x: panXOffset})
+
   }
 
   const formatDuration = (duration) => {
@@ -60,9 +81,20 @@ export default function({ route, navigation }) {
 
   }
 
+  const seekVideoProgress = (gestureState) => {
+    const offsetLimit = hp(100)
+    const moveOffset = (gestureState.moveX > offsetLimit) ? offsetLimit : gestureState.moveX;
+    const progressPercent = moveOffset / hp(100) * 100
+    const progressToVideoTime = progressPercent / 100 * videoDurationRef.current
+
+    player.current.seek(progressToVideoTime)
+  }
+
   const togglePlayerControl = () => {
 
-    console.log(playerControlShown)
+    if( videoPlayerControlTimeout.current ) {
+      clearTimeout(videoPlayerControlTimeout.current)
+    }
 
     if( playerControlShown && currentTime > 3 ) {
       return showPlayerControl(false)
@@ -70,9 +102,35 @@ export default function({ route, navigation }) {
 
     showPlayerControl(true)
 
-    setTimeout(() => showPlayerControl(false), 5000)
-
+    videoPlayerControlTimeout.current = setTimeout(() => showPlayerControl(false), PLAYER_HIDE_TIMEOUT)
   }
+
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        setVideoPanActive(true)
+        clearTimeout(videoPlayerControlTimeout.current)
+        videoPlayerControlTimeout.current = null
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        seekVideoProgress(gestureState)
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        setVideoPanActive(false)
+        videoPlayerControlTimeout.current = setTimeout(() => showPlayerControl(false), PLAYER_HIDE_TIMEOUT)
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        return true;
+      }
+    })
+  ).current;
 
 
   useEffect(() => {
@@ -86,6 +144,7 @@ export default function({ route, navigation }) {
   return (
     <>
           <Video
+            ref={player}
             source={{uri: video_url}}
             onBuffer={onBuffer}
             onError={videoError}
@@ -103,7 +162,7 @@ export default function({ route, navigation }) {
           playerControlShown ?
 
               <TouchableWithoutFeedback
-                onPress={() => togglePlayerControl()} >
+                onPress={() => togglePlayerControl()}>
                 <LinearGradient
                   colors={[getColor('brand-dark'), getColor('brand-dark opacity-60'), getColor('brand-dark')]}
                   style={[tailwind(' w-full flex  justify-between h-full')]}>
@@ -119,13 +178,19 @@ export default function({ route, navigation }) {
                           : <TouchableWithoutFeedback onPress={() => pauseVideo(true)}><PauseButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback>
                       }
                     </View>
-                    <View style={[  tailwind('flex items-center justify-between'), { marginBottom: hp(5), marginHorizontal: wp(5) } ]}>
+                    <View style={[  tailwind('flex items-center justify-between'), { marginBottom: hp(5), marginHorizontal: wp(10) } ]} >
                       <View style={[ tailwind('flex flex-row items-center justify-between'), {width: '100%'} ]}>
-                        <View style={[ { width: '92%' } ]}>
+                        <View style={[ { width: '91%' } ]}>
                           <View style={[tailwind('absolute top-0 h-1 bg-white opacity-30 rounded-lg'), { width: '100%' }]} />
                           <View style={[{ width: `${ currentTime / videoDuration * 100}%` }, tailwind('flex flex-row items-center justify-between absolute top-0 ') ]}>
                             <View style={[tailwind('h-1 bg-brand rounded-lg'), { width: '100%' }]} />
-                            <View style={[tailwind('absolute right-0 h-5 w-5 bg-brand rounded-full')]} />
+                            <Animated.View
+                              style={[
+                                tailwind(`absolute  ${videoPanActive ? 'h-5 w-5' : 'h-4 w-4'} bg-brand rounded-full`), {
+                                transform: [{ translateX: videoPan.x }]
+                              }]}
+                              {...panResponder.panHandlers}
+                            />
                           </View>
                         </View>
                         <Text style={[  tailwind('text-white'), { width: '7%' }  ]}>{ formatDuration(videoDuration - currentTime) }</Text>
@@ -136,7 +201,9 @@ export default function({ route, navigation }) {
             :
               <TouchableWithoutFeedback
                 onPress={() => togglePlayerControl()}
-                style={[{ width: '100%', height: '100%' }, tailwind('')]} />
+                style={[{ width: '100%', height: '100%' }, tailwind('')]}>
+                <View style={[{ width: '100%', height: '100%' }, tailwind('')]} />
+              </TouchableWithoutFeedback>
         }
 
     </>

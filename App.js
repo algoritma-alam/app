@@ -13,13 +13,17 @@ import CategoryListingBlueprint from '@pages/blueprints/CategoryListingBlueprint
 import TabNavigation from '@components/TabNavigation'
 import CategoryDetails from '@pages/CategoryDetails';
 import VideoPlayer from '@pages/VideoPlayer';
+import SplashScreen from 'react-native-splash-screen'
 
 export default function App() {
 
     const [ isLoaded, setIsLoaded ] = useState(false)
 
     useEffect(() => {
-        setTimeout(() => setIsLoaded(true), 1000)
+        SplashScreen.hide()
+
+        const loadedTimeout = setTimeout(() => setIsLoaded(true), 1000)
+        return () => clearTimeout(loadedTimeout)
     })
 
     const HomePageLoader = ({ navigation }) => isLoaded ? <NewHomePage navigation={navigation} /> : <HomePageBlueprint navigation={navigation}/>
@@ -66,7 +70,7 @@ export default function App() {
                     headerShown: false}}
             >
                 <RootStack.Screen name="MainScreen" component={MainTabStack} />
-                <RootStack.Screen name="VideoPlayerModal" component={VideoPlayer} />
+                <RootStack.Screen name="VideoPlayerModal" component={VideoPlayer} options={{gestureEnabled: false}} />
             </RootStack.Navigator>
 
 
