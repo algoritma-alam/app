@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-custom-controls';
-import { TouchableWithoutFeedback, PanResponder } from 'react-native'
+import { TouchableWithoutFeedback, PanResponder, TouchableOpacity, StatusBar } from 'react-native'
 import Orientation from 'react-native-orientation';
 import { tailwind, getColor } from '@resources/tailwind'
 import { View, Text, Animated } from 'react-native'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import BackButtonX from '@components/BackButtonX';
-import { PlayButton, PauseButton } from '@resources/icons'
+import { PlayButton, PauseButton, TimesIcon } from '@resources/icons'
 import Draggable from 'react-native-draggable';
 
 export default function({ route, navigation }) {
@@ -124,8 +124,6 @@ export default function({ route, navigation }) {
         setVideoPanActive(false)
         videoPlayerControlTimeout.current = setTimeout(() => showPlayerControl(false), PLAYER_HIDE_TIMEOUT)
       },
-      onPanResponderTerminate: (evt, gestureState) => {
-      },
       onShouldBlockNativeResponder: (evt, gestureState) => {
         return true;
       }
@@ -143,6 +141,7 @@ export default function({ route, navigation }) {
 
   return (
     <>
+          <StatusBar hidden={true} />
           <Video
             ref={player}
             source={{uri: video_url}}
@@ -169,7 +168,11 @@ export default function({ route, navigation }) {
 
                     <View style={[  tailwind('flex flex-row items-center justify-between'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
                       <Text style={ tailwind('text-white font-bold text-xl') }>{ title }</Text>
-                      <BackButtonX style={tailwind('bg-transparent')} innerStyle={ tailwind('text-white opacity-100 font-extrabold') } onPress={() => navigation.goBack()}/>
+                      <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+                        <View  style={[tailwind('rounded-full bg-brand-darker bg-opacity-50 w-7 h-7 flex items-center justify-center bg-transparent mr-2')]}>
+                            <TimesIcon style={[tailwind('h-6 w-6 text-white opacity-70 bg-transparent')]} fill={getColor('transparent')}/>
+                        </View>
+                      </TouchableOpacity>
                     </View>
                     <View style={[  tailwind('flex flex-row items-center justify-center'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
                       {
@@ -201,7 +204,7 @@ export default function({ route, navigation }) {
             :
               <TouchableWithoutFeedback
                 onPress={() => togglePlayerControl()}
-                style={[{ width: '100%', height: '100%' }, tailwind('')]}>
+                style={[{ width: '100%', height: '100%' }, tailwind('bg-white')]}>
                 <View style={[{ width: '100%', height: '100%' }, tailwind('')]} />
               </TouchableWithoutFeedback>
         }

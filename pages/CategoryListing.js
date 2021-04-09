@@ -8,6 +8,7 @@ import videos from '@resources/videos'
 import CategoryListingBlueprint from '@pages/blueprints/CategoryListingBlueprint';
 import CategoryCover from '@components/CategoryCover';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import FastImage from 'react-native-fast-image'
 
 export default function( { children, navigation } ) {
 
@@ -37,7 +38,7 @@ export default function( { children, navigation } ) {
             <SafeAreaView style={[ tailwind('flex relative h-full   pt-10'), { width: wp(90), marginHorizontal: wp(5) }]}>
               <View style={[tailwind('absolute inset-0  z-20  ')]}>
                 <View style={tailwind('flex flex-row justify-between items-center w-full')}>
-                  <Image source={LogoRibbon} style={[tailwind(' w-14 h-20'), {resizeMode: 'cover'}]} />
+                  <FastImage source={LogoRibbon} style={[tailwind(' w-14 h-20'), {resizeMode: 'cover'}]} />
                   <BackButtonX style={tailwind('mt-12')} onPress={() => navigation.goBack()}/>
                 </View>
 

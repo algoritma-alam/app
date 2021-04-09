@@ -5,6 +5,7 @@ import { PlayIcon } from '@resources/icons'
 import { LinearGradient } from 'expo-linear-gradient';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image'
 
 export default function WatchedVideoCard({ video: { item } }) {
 
@@ -20,17 +21,17 @@ export default function WatchedVideoCard({ video: { item } }) {
     return (
         <View style={[tailwind('flex bg-brand-darker'), { width: wp(87/3), marginBottom: hp(1) }]}>
           <View style={[tailwind('absolute left-2 top-0  z-20')]}>
-            <Image source={LogoRibbon} style={[tailwind('h-8 w-8'), { resizeMode: 'center' }]}/>
+            <FastImage source={LogoRibbon} style={[tailwind('h-8 w-8'), { resizeMode: 'center' }]}/>
           </View>
 
-          <ImageBackground source={thumbnailStatic} style={tailwind('h-40 w-full flex items-center justify-center relative')}>
+          <FastImage source={thumbnailStatic} style={tailwind('h-40 w-full flex items-center justify-center relative')}>
             <TouchableOpacity activeOpacity={.5} onPress={playVideo}>
               <PlayIcon style={ tailwind('h-5 w-5 ') } circleStyle={tailwind('bg-brand-dark')} />
             </TouchableOpacity>
             <View style={tailwind('absolute h-14 w-full top-0')}>
               <LinearGradient colors={[ getColor('brand-darker opacity-80'), 'transparent']} style={tailwind('absolute top-0  left-0 right-0 h-full w-full')} />
             </View>
-          </ImageBackground>
+          </FastImage>
           <View style={[tailwind('bg-brand-dark w-full h-9 -mt-4 flex items-start justify-center relative ')]}>
             <View style={[tailwind('w-full h-0.5 z-30 absolute top-0'), { backgroundColor: '#8E1013', width: Math.floor(Math.random() * 100) }]} />
             <View style={[tailwind('w-full h-0.5 z-20 bg-opacity-40 absolute top-0'), { backgroundColor: '#fff' }]} />

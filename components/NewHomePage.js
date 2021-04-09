@@ -13,6 +13,7 @@ import { AlgoritmaAlamNoBackground } from '@resources/icons'
 import WatchedVideoCard from '@components/WatchedVideoCard';
 import VideoCard from '@components/VideoCard';
 import Orientation from 'react-native-orientation';
+import FastImage from 'react-native-fast-image'
 
 
 export default function( { navigation } ) {
@@ -56,7 +57,7 @@ export default function( { navigation } ) {
 
         <ScrollView bounces={false} contentContainerStyle={[ { paddingBottom: hp(10) }]}>
           <View style={[tailwind('absolute inset-0 ml-5 z-20 w-12 h-20')]}>
-            <Image source={LogoRibbon} style={[tailwind('w-14 h-20'), {resizeMode: 'cover'}]} />
+            <FastImage source={LogoRibbon} style={[tailwind('w-14 h-20'), {resizeMode: 'cover'}]} />
           </View>
 
           <View style={[{ width: wp(100), height: recommendedVideoHeight, resizeMode: 'center' }, tailwind('bg-brand-darker') ]}>
