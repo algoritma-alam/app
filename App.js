@@ -8,6 +8,8 @@ import HomePageBlueprint from '@pages/blueprints/HomePageBlueprint';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { tailwind } from "@resources/tailwind"
 import SearchPage from '@pages/SearchPage'
+import MerchPage from '@pages/MerchPage'
+import AboutPage from '@pages/AboutPage'
 import CategoryListing from '@pages/CategoryListing'
 import CategoryListingBlueprint from '@pages/blueprints/CategoryListingBlueprint'
 import TabNavigation from '@components/TabNavigation'
@@ -56,8 +58,8 @@ export default function App() {
             >
                 <Tab.Screen name="home" component={HomeStackScreen}  options={{ title: 'Beranda' }}/>
                 <Tab.Screen name="search" component={SearchPage} options={{ title: 'Pencarian' }}/>
-                <Tab.Screen name="merch" component={HomePageBlueprint} options={{ title: 'Merch' }}/>
-                <Tab.Screen name="more" component={HomePageBlueprint}  options={{ title: 'Lainya' }}/>
+                <Tab.Screen name="merch" component={MerchPage} options={{ title: 'Merch' }}/>
+                <Tab.Screen name="more" component={AboutPage}  options={{ title: 'Tentang' }}/>
             </Tab.Navigator>
         )
     }

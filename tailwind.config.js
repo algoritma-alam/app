@@ -9,6 +9,7 @@ module.exports = {
             'dark': '#101010',
             'darker': '#181818',
             'darkest': '#202020',
+            'gold': '#5F5040',
             "100": "#fdf1f1",
             "200": "#f5a8a9",
             "300": "#ec5a5c",
@@ -21,7 +22,10 @@ module.exports = {
           }
       },
       fontSize: {
-        'xxs': '10px'
+        'xxs': '10px',
+        '5xl': '3rem',
+        '6xl': '4rem',
+        '7xl': '5rem',
       }
     },
   },
