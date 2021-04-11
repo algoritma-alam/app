@@ -72,7 +72,7 @@ export default function App() {
                     headerShown: false}}
             >
                 <RootStack.Screen name="MainScreen" component={MainTabStack} />
-                <RootStack.Screen name="VideoPlayerModal" component={VideoPlayer} options={{gestureEnabled: false}} />
+                <RootStack.Screen name="VideoPlayerModal" component={VideoPlayer} options={{gestureEnabled: false, animationEnabled: false}} />
             </RootStack.Navigator>
 
 

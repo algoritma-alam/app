@@ -21,6 +21,8 @@
 		71C6BFBAC52046DE866F35DD /* caveat.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BA82F04B990343F3A57DD2BD /* caveat.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C87B957B6937AAE97585F787 /* libPods-Algoritma-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFAF0F2008F9FAA1E2BD9B72 /* libPods-Algoritma-tvOS.a */; };
+		9F95EC8766F14524BD681DBD /* NothingYouCouldDo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1555A8670C624CABA17E752C /* NothingYouCouldDo.ttf */; };
+		821E0E0EDC604BCEB4A9A65E /* SedgwickAve.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E893E6099DCF480BB4C0D8D0 /* SedgwickAve.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,8 @@
 		F472E67259A4DC746D55046F /* libPods-Algoritma.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Algoritma.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F81E948F8558B12395836A /* libPods-Algoritma-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Algoritma-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFAF0F2008F9FAA1E2BD9B72 /* libPods-Algoritma-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Algoritma-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1555A8670C624CABA17E752C /* NothingYouCouldDo.ttf */ = {isa = PBXFileReference; name = "NothingYouCouldDo.ttf"; path = "../assets/fonts/NothingYouCouldDo.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E893E6099DCF480BB4C0D8D0 /* SedgwickAve.ttf */ = {isa = PBXFileReference; name = "SedgwickAve.ttf"; path = "../assets/fonts/SedgwickAve.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +208,8 @@
 			isa = PBXGroup;
 			children = (
 				BA82F04B990343F3A57DD2BD /* caveat.ttf */,
+				1555A8670C624CABA17E752C /* NothingYouCouldDo.ttf */,
+				E893E6099DCF480BB4C0D8D0 /* SedgwickAve.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -354,6 +360,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				71C6BFBAC52046DE866F35DD /* caveat.ttf in Resources */,
+				9F95EC8766F14524BD681DBD /* NothingYouCouldDo.ttf in Resources */,
+				821E0E0EDC604BCEB4A9A65E /* SedgwickAve.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

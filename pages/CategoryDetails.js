@@ -55,12 +55,12 @@ export default function( { route, navigation } ) {
 
           <View style={[{ width: wp(90), marginHorizontal: wp(5)}, tailwind('h-full relative')]}>
             <View style={[tailwind('absolute inset-0  z-20  ')]}>
-              <View style={tailwind('flex flex-row justify-between items-center w-full')}>
+              <View style={tailwind('flex flex-row justify-between items-center')}>
                 <Image source={LogoRibbon} style={[tailwind(' w-14 h-20'), {resizeMode: 'cover'}]} />
               </View>
             </View>
 
-            <View style={tailwind('flex items-start h-full')}>
+            <View style={tailwind('flex items-start h-full z-50')}>
               {
                 (videosWithCategory.length > 0 )
                   ? (

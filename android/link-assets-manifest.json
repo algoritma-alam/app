@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/NothingYouCouldDo.ttf",
+      "sha1": "1b9dd6d7ce9cdd9aa15c5aea8d270852c37f2be6"
+    },
+    {
+      "path": "assets/fonts/SedgwickAve.ttf",
+      "sha1": "0dd9c1438450e958ce46f2e0a8d5afaec98ef74f"
+    },
+    {
+      "path": "assets/fonts/caveat.ttf",
+      "sha1": "853ed6fbe01c86a6ce790924d0e76a9d7f4d7bbc"
+    }
+  ]
+}

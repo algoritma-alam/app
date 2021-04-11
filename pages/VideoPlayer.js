@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-custom-controls';
-import { TouchableWithoutFeedback, PanResponder, TouchableOpacity, StatusBar } from 'react-native'
+import { TouchableWithoutFeedback, PanResponder, TouchableOpacity, StatusBar, ActivityIndicator, Alert } from 'react-native'
 import Orientation from 'react-native-orientation';
 import { tailwind, getColor } from '@resources/tailwind'
 import { View, Text, Animated } from 'react-native'
@@ -20,6 +20,9 @@ export default function({ route, navigation }) {
   const [ playerControlShown, showPlayerControl ] = useState(false)
   const [ isPaused, pauseVideo ] = useState(false)
   const [ videoPanActive, setVideoPanActive ] = useState(false)
+  const [ isVideoReady, setVideoIsReady ] = useState(false)
+  const [ showVideoPlayer, setShowVideoPlayer ] = useState(true)
+  const [ isBuffering, setIsBuffering ] = useState(false)
 
   const { video: { video_url, title } } = route.params
 
@@ -28,18 +31,49 @@ export default function({ route, navigation }) {
   const player = useRef()
   const videoDurationRef = useRef()
   const videoPlayerControlTimeout = useRef()
+  const isCurrentlyClosingVideoPlayer = useRef()
 
   videoDurationRef.current = videoDuration
 
-  const onBuffer = () => {
-    console.log('buffering')
+  const onVideoBuffering = (buffer) => {
+    setIsBuffering(buffer.isBuffering)
+
+    console.log('is buffering: ' , buffer.isBuffering)
+
+    if( buffer.isBuffering && ! playerControlShown ) {
+      togglePlayerControl()
+    }
   }
 
-  const videoError = () => {
-    console.log('error')
+  const videoError = (err) => {
+    const { error: { code, domain } } = err
+    Alert.alert(
+      'Terjadi kesalahan!',
+      `Error ${domain + ': ' + code}`,
+      [
+        {
+          text: "Tutup",
+          onPress: () => navigation.goBack(),
+          style: "cancel",
+        },
+      ]
+    )
   }
 
-  const onVideoLoad = (meta) => {
+  const onVideoLoadStart = () => {
+    setIsBuffering(true)
+  }
+
+  const onVideoLoaded = (meta) => {
+    setIsBuffering(false)
+    setVideoIsReady(true)
+
+    const initialOrientation = Orientation.getInitialOrientation();
+
+    if( initialOrientation == 'PORTRAIT' ) {
+      Orientation.lockToLandscape()
+    }
+
     togglePlayerControl()
     setVideoDuration(meta.duration)
   }
@@ -72,23 +106,20 @@ export default function({ route, navigation }) {
       .join(":")
   }
 
-  const configureVideoPlayer = () => {
-    const initialOrientation = Orientation.getInitialOrientation();
+  const closeVideoPlayer = () => {
 
-    if( initialOrientation == 'PORTRAIT' ) {
-      Orientation.lockToLandscape()
-    }
+    isCurrentlyClosingVideoPlayer.current = true
 
+    pauseVideo(true)
+    setVideoIsReady(false)
+    setShowVideoPlayer(false)
+    Orientation.lockToPortrait()
+
+    setTimeout(() => {
+      navigation.goBack()
+    }, 600)
   }
 
-  const seekVideoProgress = (gestureState) => {
-    const offsetLimit = hp(100)
-    const moveOffset = (gestureState.moveX > offsetLimit) ? offsetLimit : gestureState.moveX;
-    const progressPercent = moveOffset / hp(100) * 100
-    const progressToVideoTime = progressPercent / 100 * videoDurationRef.current
-
-    player.current.seek(progressToVideoTime)
-  }
 
   const togglePlayerControl = () => {
 
@@ -112,12 +143,26 @@ export default function({ route, navigation }) {
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (evt, gestureState) => {
+        Animated.event(
+          [
+            null,
+            { dx: videoPan.x, dy: videoPan.y }
+          ],
+          {
+            useNativeDriver: true
+          }
+        )
         setVideoPanActive(true)
         clearTimeout(videoPlayerControlTimeout.current)
         videoPlayerControlTimeout.current = null
       },
       onPanResponderMove: (evt, gestureState) => {
-        seekVideoProgress(gestureState)
+        const offsetLimit = hp(100)
+        const moveOffset = (gestureState.moveX > offsetLimit) ? offsetLimit : gestureState.moveX;
+        const progressPercent = moveOffset / hp(100) * 100
+        const progressToVideoTime = progressPercent / 100 * videoDurationRef.current
+
+        player.current.seek(progressToVideoTime)
       },
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
@@ -130,45 +175,55 @@ export default function({ route, navigation }) {
     })
   ).current;
 
-
   useEffect(() => {
-    configureVideoPlayer()
+    navigation.addListener('beforeRemove', (e) => {
+      if( ! isCurrentlyClosingVideoPlayer.current ) {
+        e.preventDefault()
 
-    return () => {
-      Orientation.lockToPortrait()
-    }
-  }, [])
+        return closeVideoPlayer()
+      }
+
+      return navigation.dispatch(e.data.action)
+
+    })
+  }, [navigation])
 
   return (
     <>
           <StatusBar hidden={true} />
-          <Video
-            ref={player}
-            source={{uri: video_url}}
-            onBuffer={onBuffer}
-            onError={videoError}
-            onLoad={onVideoLoad}
-            onProgress={onVideoProgress}
-            paused={isPaused}
-            progressUpdateInterval={1000}
-            seekColor={ getColor('brand') }
-            resizeMode="cover"
-            volume={1}
-            style={[tailwind('absolute bottom-0 top-0 left-0 right-0 bg-brand-dark')]} />
+          {
+            showVideoPlayer &&
+                <Video
+                  ref={player}
+                  source={{uri: video_url}}
+                  onBuffer={onVideoBuffering}
+                  onError={videoError}
+                  onLoadStart={onVideoLoadStart}
+                  onLoad={onVideoLoaded}
+                  onEnd={closeVideoPlayer}
+                  onProgress={onVideoProgress}
+                  onAudioBecomingNoisy={() => pauseVideo(true)}
+                  paused={isPaused}
+                  progressUpdateInterval={1000}
+                  seekColor={ getColor('brand') }
+                  resizeMode="cover"
+                  volume={1}
+                  style={[tailwind('absolute bottom-0 top-0 left-0 right-0 bg-brand-dark')]} />
+          }
 
 
         {
-          playerControlShown ?
+          playerControlShown && isVideoReady ?
 
               <TouchableWithoutFeedback
                 onPress={() => togglePlayerControl()}>
                 <LinearGradient
-                  colors={[getColor('brand-dark'), getColor('brand-dark opacity-60'), getColor('brand-dark')]}
+                  colors={[getColor('brand-dark'), getColor('brand-dark opacity-70'), getColor('brand-dark')]}
                   style={[tailwind(' w-full flex  justify-between h-full')]}>
 
                     <View style={[  tailwind('flex flex-row items-center justify-between'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
                       <Text style={ tailwind('text-white font-bold text-xl') }>{ title }</Text>
-                      <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+                      <TouchableOpacity onPress={() => closeVideoPlayer()} activeOpacity={0.7}>
                         <View  style={[tailwind('rounded-full bg-brand-darker bg-opacity-50 w-7 h-7 flex items-center justify-center bg-transparent mr-2')]}>
                             <TimesIcon style={[tailwind('h-6 w-6 text-white opacity-70 bg-transparent')]} fill={getColor('transparent')}/>
                         </View>
@@ -177,8 +232,11 @@ export default function({ route, navigation }) {
                     <View style={[  tailwind('flex flex-row items-center justify-center'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
                       {
                         isPaused
-                          ? <TouchableWithoutFeedback onPress={() => pauseVideo(false)}><PlayButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback>
-                          : <TouchableWithoutFeedback onPress={() => pauseVideo(true)}><PauseButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback>
+                          ? ( ! isBuffering && <TouchableWithoutFeedback onPress={() => pauseVideo(false)}><PlayButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
+                          : ( ! isBuffering && <TouchableWithoutFeedback onPress={() => pauseVideo(true)}><PauseButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
+                      }
+                      {
+                        isBuffering  && <ActivityIndicator size="large" color={getColor('white')}/>
                       }
                     </View>
                     <View style={[  tailwind('flex items-center justify-between'), { marginBottom: hp(5), marginHorizontal: wp(10) } ]} >
@@ -206,6 +264,22 @@ export default function({ route, navigation }) {
                 onPress={() => togglePlayerControl()}
                 style={[{ width: '100%', height: '100%' }, tailwind('bg-white')]}>
                 <View style={[{ width: '100%', height: '100%' }, tailwind('')]} />
+              </TouchableWithoutFeedback>
+        }
+
+        {
+          ! isVideoReady && <View style={[tailwind('flex items-center justify-center bg-brand-dark w-full h-full absolute top-0 right-0 left-0')]}>
+                              {
+                                ! isBuffering && <ActivityIndicator color={getColor('white')}/>
+                              }
+                            </View>
+        }
+
+        {
+          isBuffering && ! playerControlShown &&
+              <TouchableWithoutFeedback
+                onPress={() => togglePlayerControl()}>
+                <View style={[tailwind('flex items-center justify-center  w-full h-full absolute top-0 right-0 left-0')]}><ActivityIndicator size="large" color={getColor('white')}/></View>
               </TouchableWithoutFeedback>
         }
 

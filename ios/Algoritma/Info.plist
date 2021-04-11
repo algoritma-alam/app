@@ -60,6 +60,8 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>caveat.ttf</string>
+		<string>NothingYouCouldDo.ttf</string>
+		<string>SedgwickAve.ttf</string>
 	</array>
 </dict>
 </plist>
