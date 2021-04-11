@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import {  View, SafeAreaView, Image, Text, StatusBar, ImageBackground, TouchableWithoutFeedback, Linking } from 'react-native'
+import {  View, SafeAreaView, Image, Text, StatusBar, ImageBackground, TouchableWithoutFeedback, Linking, Platform } from 'react-native'
 import { tailwind, getColor } from "@resources/tailwind"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import FastImage from 'react-native-fast-image'
@@ -40,11 +40,11 @@ export default function( { children, navigation } ) {
 
               <View style={[tailwind(' w-full flex  justify-center z-50'), { marginVertical: hp(15), height: hp(60) }]}>
                 <View style={[tailwind('w-full')]}>
-                  <Text style={[tailwind('text-white font-black text-6xl')]}>Coming</Text>
-                  <Text style={[tailwind('text-white -mt-5 font-black text-6xl')]}>soon...</Text>
+                  <Text style={[tailwind(`text-white ${Platform.OS == 'ios' ? 'font-black' : 'font-bold'} text-6xl`)]}>Coming</Text>
+                  <Text style={[tailwind(`-mt-5 text-white ${Platform.OS == 'ios' ? 'font-black' : 'font-bold'} text-6xl`)]}>soon...</Text>
                 </View>
                 <View style={[tailwind('w-full mt-2')]}>
-                  <Text style={[tailwind('text-white font-light  text-sm')]}>Merch belum tersedia di Aplikasi saat ini,</Text>
+                  <Text style={[tailwind('text-white font-light  text-sm')]}>Merch belum tersedia di versi Aplikasi saat ini,</Text>
                   <Text style={[tailwind('text-white font-light text-sm')]}>tapi kamu bisa mengunjungi <Text style={[tailwind('font-bold')]}>Official Store</Text> dengan</Text>
                   <TouchableWithoutFeedback onPress={openLinkHandler}>
                     <Text style={[tailwind('font-bold text-white underline')]}>Klik Disini</Text>

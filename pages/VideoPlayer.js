@@ -30,15 +30,28 @@ export default function({ route, navigation }) {
   const videoPan = useRef(new Animated.ValueXY()).current;
   const player = useRef()
   const videoDurationRef = useRef()
+  const currentTimeRef = useRef()
+  const resetOffsetRef = useRef(0)
+  const panPosition = useRef(0)
   const videoPlayerControlTimeout = useRef()
   const isCurrentlyClosingVideoPlayer = useRef()
+  const seeking = useRef()
+  const seekingProgress = useRef()
+  const panOffset = useRef({x: 0})
+
 
   videoDurationRef.current = videoDuration
+  currentTimeRef.current = currentTime
 
   const onVideoBuffering = (buffer) => {
+
+    if( videoPanActive ) return;
+
     setIsBuffering(buffer.isBuffering)
 
-    console.log('is buffering: ' , buffer.isBuffering)
+    if( ! buffer.isBuffering && isPaused ) {
+      pauseVideo(false)
+    }
 
     if( buffer.isBuffering && ! playerControlShown ) {
       togglePlayerControl()
@@ -46,10 +59,20 @@ export default function({ route, navigation }) {
   }
 
   const videoError = (err) => {
-    const { error: { code, domain } } = err
+    let errorDetails = null
+    if( Platform.OS == 'ios' ) {
+      const { error: { code, domain } } = err
+      errorDetails = `Error ${domain + ': ' + code}`
+    }
+    else
+    {
+      const { error: { extra } } = err
+      errorDetails = `Error ${extra}`
+    }
+
     Alert.alert(
       'Terjadi kesalahan!',
-      `Error ${domain + ': ' + code}`,
+      errorDetails,
       [
         {
           text: "Tutup",
@@ -86,11 +109,14 @@ export default function({ route, navigation }) {
 
   const updateVideoPan = () => {
 
+    if( videoPanActive ) return;
+
     const position = (currentTime / videoDuration * 100)
 
     const panXOffset = position / 100 * (hp(90) / hp(100) * hp(90))
 
-    videoPan.setOffset({x: panXOffset})
+    videoPan.setOffset({x: panXOffset - videoPan.x._value, y: videoPan.y})
+    panPosition.current = panXOffset
 
   }
 
@@ -142,32 +168,60 @@ export default function({ route, navigation }) {
       onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onPanResponderGrant: (evt, gestureState) => {
-        Animated.event(
-          [
-            null,
-            { dx: videoPan.x, dy: videoPan.y }
-          ],
-          {
-            useNativeDriver: true
-          }
-        )
+      onPanResponderGrant: () => {
+
+        pauseVideo(true)
         setVideoPanActive(true)
         clearTimeout(videoPlayerControlTimeout.current)
-        videoPlayerControlTimeout.current = null
+
+        videoPan.extractOffset()
+        if( videoPan.x._value != undefined ) {
+          const position = (currentTimeRef.current / videoDurationRef.current * 100)
+          const positionOffset = position / 100 * (hp(90) / hp(100) * hp(90))
+
+          resetOffsetRef.current = positionOffset
+          videoPan.setOffset({
+            x: positionOffset,
+            y: videoPan.y._value
+          });
+
+        }
+
       },
-      onPanResponderMove: (evt, gestureState) => {
-        const offsetLimit = hp(100)
-        const moveOffset = (gestureState.moveX > offsetLimit) ? offsetLimit : gestureState.moveX;
-        const progressPercent = moveOffset / hp(100) * 100
+      onPanResponderMove: Animated.event(
+        [
+          null,
+          { dx: (videoPan.x._value > (hp(90) / hp(100) * hp(90))) ? (hp(90) / hp(100) * hp(90)) : videoPan.x }
+        ],
+        { useNativeDriver: false }
+      ),
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: () => {
+
+        if( resetOffsetRef.current > 0 ) {
+          const offsetToApply = resetOffsetRef.current + videoPan.x._value
+          videoPan.setValue({x: offsetToApply, y: videoPan.y})
+        }
+
+        setVideoPanActive(false)
+        //pauseVideo(false)
+        setIsBuffering(true)
+
+        const offsetLimit = (hp(90) / hp(100) * hp(90))
+        const moveOffset = (videoPan.x._value > offsetLimit) ? offsetLimit : videoPan.x._value;
+        const progressPercent = moveOffset / offsetLimit * 100
         const progressToVideoTime = progressPercent / 100 * videoDurationRef.current
 
+        setCurrentTime(progressToVideoTime)
         player.current.seek(progressToVideoTime)
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        setVideoPanActive(false)
         videoPlayerControlTimeout.current = setTimeout(() => showPlayerControl(false), PLAYER_HIDE_TIMEOUT)
+
+        const position = (currentTimeRef.current / videoDurationRef.current * 100)
+        const positionOffset = position / 100 * (hp(90) / hp(100) * hp(90))
+        videoPan.setOffset({x: positionOffset - moveOffset})
+
+        panPosition.current = positionOffset
+        resetOffsetRef.current = positionOffset
       },
       onShouldBlockNativeResponder: (evt, gestureState) => {
         return true;
@@ -204,7 +258,6 @@ export default function({ route, navigation }) {
                   onProgress={onVideoProgress}
                   onAudioBecomingNoisy={() => pauseVideo(true)}
                   paused={isPaused}
-                  progressUpdateInterval={1000}
                   seekColor={ getColor('brand') }
                   resizeMode="cover"
                   volume={1}
@@ -232,8 +285,8 @@ export default function({ route, navigation }) {
                     <View style={[  tailwind('flex flex-row items-center justify-center'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
                       {
                         isPaused
-                          ? ( ! isBuffering && <TouchableWithoutFeedback onPress={() => pauseVideo(false)}><PlayButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
-                          : ( ! isBuffering && <TouchableWithoutFeedback onPress={() => pauseVideo(true)}><PauseButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
+                          ? ( ! isBuffering && ! seeking.current && <TouchableWithoutFeedback onPress={() => pauseVideo(false)}><PlayButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
+                          : ( ! isBuffering && ! seeking.current && <TouchableWithoutFeedback onPress={() => pauseVideo(true)}><PauseButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
                       }
                       {
                         isBuffering  && <ActivityIndicator size="large" color={getColor('white')}/>
@@ -248,7 +301,15 @@ export default function({ route, navigation }) {
                             <Animated.View
                               style={[
                                 tailwind(`absolute  ${videoPanActive ? 'h-5 w-5' : 'h-4 w-4'} bg-brand rounded-full`), {
-                                transform: [{ translateX: videoPan.x }]
+                                  transform: [
+                                    { translateX: videoPan.x.interpolate({
+                                          inputRange: [hp(0), hp(81)],
+                                          outputRange: [hp(0), hp(81)],
+                                          extrapolateLeft: 'clamp',
+                                          extrapolateRight: 'clamp'
+                                      })
+                                    }
+                                  ]
                               }]}
                               {...panResponder.panHandlers}
                             />

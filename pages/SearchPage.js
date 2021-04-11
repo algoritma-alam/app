@@ -121,7 +121,7 @@ export default function({ navigation }) {
         <>
             <StatusBar barStyle="light-content" />
             <View style={ tailwind(`flex relative h-full bg-brand-dark items-center `) }>
-                <SafeAreaView  style={[  tailwind(`bg-brand-darker flex justify-end items-center `) , { width: '100%', height: addAdditionalHeight && Platform.OS == 'android' ? '25%' : '15%' } ]}>
+                <SafeAreaView  style={[  tailwind(`bg-brand-darker flex justify-end items-center `) , { width: '100%', height:  '15%' } ]}>
                     <View style={[{width: '95%'}, tailwind('flex flex-row ')  ]}>
                         <View
                             style={[ tailwind('bg-brand-darkest h-10 rounded-l-lg flex items-center justify-center'), { width: '10%' } ]}
