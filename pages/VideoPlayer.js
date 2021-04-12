@@ -20,9 +20,9 @@ export default function({ route, navigation }) {
   const [ playerControlShown, showPlayerControl ] = useState(false)
   const [ isPaused, pauseVideo ] = useState(false)
   const [ videoPanActive, setVideoPanActive ] = useState(false)
-  const [ isVideoReady, setVideoIsReady ] = useState(false)
+  const [ isVideoReady, setVideoIsReady ] = useState(true)
   const [ showVideoPlayer, setShowVideoPlayer ] = useState(true)
-  const [ isBuffering, setIsBuffering ] = useState(false)
+  const [ isBuffering, setIsBuffering ] = useState(true)
 
   const { video: { video_url, title } } = route.params
 
@@ -36,9 +36,7 @@ export default function({ route, navigation }) {
   const videoPlayerControlTimeout = useRef()
   const isCurrentlyClosingVideoPlayer = useRef()
   const seeking = useRef()
-  const seekingProgress = useRef()
-  const panOffset = useRef({x: 0})
-
+  const videoLoadedStatus = useRef(false)
 
   videoDurationRef.current = videoDuration
   currentTimeRef.current = currentTime
@@ -85,11 +83,23 @@ export default function({ route, navigation }) {
 
   const onVideoLoadStart = () => {
     setIsBuffering(true)
+
+    const initialOrientation = Orientation.getInitialOrientation();
+
+    if( initialOrientation == 'PORTRAIT' ) {
+      Orientation.lockToLandscape()
+    }
+
+    togglePlayerControl()
+
+    clearTimeout(videoPlayerControlTimeout.current)
   }
 
   const onVideoLoaded = (meta) => {
     setIsBuffering(false)
     setVideoIsReady(true)
+
+    videoLoadedStatus.current = true
 
     const initialOrientation = Orientation.getInitialOrientation();
 
@@ -164,10 +174,10 @@ export default function({ route, navigation }) {
 
   const panResponder = React.useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => videoLoadedStatus.current,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => videoLoadedStatus.current,
+      onMoveShouldSetPanResponder: (evt, gestureState) => videoLoadedStatus.current,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => videoLoadedStatus.current,
       onPanResponderGrant: () => {
 
         pauseVideo(true)
@@ -204,7 +214,7 @@ export default function({ route, navigation }) {
         }
 
         setVideoPanActive(false)
-        //pauseVideo(false)
+        pauseVideo(false)
         setIsBuffering(true)
 
         const offsetLimit = (hp(90) / hp(100) * hp(90))
@@ -331,7 +341,7 @@ export default function({ route, navigation }) {
         {
           ! isVideoReady && <View style={[tailwind('flex items-center justify-center bg-brand-dark w-full h-full absolute top-0 right-0 left-0')]}>
                               {
-                                ! isBuffering && <ActivityIndicator color={getColor('white')}/>
+                                ! isBuffering && <ActivityIndicator size="large" color={getColor('white')}/>
                               }
                             </View>
         }

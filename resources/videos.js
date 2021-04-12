@@ -28,7 +28,7 @@ export default videos = [
     {
         "id": 2,
         "title": "JIMAT POPOK WEWE",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/JIMAT%20POPOK%20WEWE_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/JIMAT%20POPOK%20WEWE_1080pp.mp4",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/jimat-popok-wewe.png",
         "thumbnailStatic": require('../assets/images/2.png'),
         "tags": [
