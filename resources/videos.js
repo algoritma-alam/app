@@ -2,7 +2,7 @@ export default videos = [
     {
         "id": 0,
         "title": "ANTARA BENCANA ALAM DAN DARAH PERAWAN",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/ANTARA%20BENCANA%20ALAM%20DAN%20DARAH%20PERAWAN_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/antara-bencana-alam-dan-darah-perawan/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/bencana%20alam%20dan%20darah%20perwan.png",
         "thumbnailStatic": require('../assets/images/0.png'),
         "tags": [
@@ -15,7 +15,7 @@ export default videos = [
     {
         "id": 1,
         "title": "MUNCULNYA SATRIO PININGIT",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/MUNCULNYA%20SATRIO%20PININGIT_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/munculnya-satrio-piningit/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/satrio%20piningit.png",
         "thumbnailStatic": require('../assets/images/1.png'),
         "tags": [
@@ -28,7 +28,7 @@ export default videos = [
     {
         "id": 2,
         "title": "JIMAT POPOK WEWE",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/JIMAT%20POPOK%20WEWE_1080pp.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/jimat-popok-wewe/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/jimat-popok-wewe.png",
         "thumbnailStatic": require('../assets/images/2.png'),
         "tags": [
@@ -41,7 +41,7 @@ export default videos = [
     {
         "id": 3,
         "title": "DARAH KORBAN KECELAKAAN",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/DARAH%20KORBAN%20KECELAKAAN_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/darah-korban-kecelakaan/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/DARAH%20KORBAN%20KECELAKAAN.png",
         "thumbnailStatic": require('../assets/images/3.png'),
         "tags": [
@@ -54,7 +54,7 @@ export default videos = [
     {
         "id": 4,
         "title": "DENDAM ROH TABRAK LARI",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/DENDAM%20ROH%20TABRAK%20LARI_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/dendam-roh-tabrak-lari/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/DENDAM%20ROH%20TABRAK%20LARI.png",
         "thumbnailStatic": require('../assets/images/4.png'),
         "tags": [
@@ -67,7 +67,7 @@ export default videos = [
     {
         "id": 5,
         "title": "SIMBAH PERNAH MENGALAMI SAKARATUL MAUT",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/SIMBAH%20PERNAH%20MENGALAMI%20SAKARATUL%20MAUT%20Proses%20Keluarnya%20Roh%20dari%20Jasad%20PART%202_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/simbah-pernah-mengalami-sakaratul-maut/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/SAKARATUL%20MAUT%20PT1.png",
         "thumbnailStatic": require('../assets/images/5.png'),
         "tags": [
@@ -80,7 +80,7 @@ export default videos = [
     {
         "id": 6,
         "title": "SIMBAH vs. HANTU GUNUNG CIREMAI",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/SIMBAH%20vs%20Hantu%20GUNUNG%20CIREMAI_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/simbah-vs-hantu-gunung-ciremai/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/simbah%20vs%20gunung%20ciremai,%20eh%20hantu.png",
         "thumbnailStatic": require('../assets/images/6.png'),
         "tags": [
@@ -93,7 +93,7 @@ export default videos = [
     {
         "id": 7,
         "title": "MENCARI ANAK HILANG DENGAN NYANYIAN TAMPAH",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/MENCARI%20ANAK%20HILANG%20dengan%20NYANYIAN%20TAMPAH_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/mencari-anak-hilang-dengan-nyanyian-tampah/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/anak%20hilang%20vs%20tampah%20aowkaowka.png",
         "thumbnailStatic": require('../assets/images/7.png'),
         "tags": [
@@ -106,7 +106,7 @@ export default videos = [
     {
         "id": 8,
         "title": "TEROR ARWAH JANIN DI KOST WANITA",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/TEROR%20ARWAH%20JANIN%20DI%20KOST%20WANITA_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/teror-arwah-janin-kost-wanita/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/TEROR%20ARWAH%20JANIN%20KOST%20WANITA.png",
         "thumbnailStatic": require('../assets/images/8.png'),
         "tags": [
@@ -119,7 +119,7 @@ export default videos = [
     {
         "id": 9,
         "title": "PERJALANAN MANUSIA DARI SEBELUM LAHIR HINGGA KEMATIAN",
-        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/PERJALANAN%20MANUSIA%20DARI%20SEBELUM%20LAHIR%20HINGGA%20KEMATIANNYA_1080p.mp4",
+        "video_url": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/with-hls-videos/perjalanan-manusia-dari-sebelum-lahir/playlist.m3u8",
         "thumbnail": "https://kodinger-cdn.sgp1.cdn.digitaloceanspaces.com/algoritma-alam/thumbnails/with-watermark/PERJALANAN%20MANUSIA%20DARI%20SEBELUM%20LAHR%20HINGGA%20KEMATIAN.png",
         "thumbnailStatic": require('../assets/images/9.png'),
         "tags": [

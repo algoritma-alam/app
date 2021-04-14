@@ -8,7 +8,7 @@ import { View, Text, Animated } from 'react-native'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import BackButtonX from '@components/BackButtonX';
-import { PlayButton, PauseButton, TimesIcon } from '@resources/icons'
+import { PlayButton, PauseButton, TimesIcon, ForwardIcon, BackwardIcon } from '@resources/icons'
 import Draggable from 'react-native-draggable';
 
 export default function({ route, navigation }) {
@@ -23,6 +23,7 @@ export default function({ route, navigation }) {
   const [ isVideoReady, setVideoIsReady ] = useState(true)
   const [ showVideoPlayer, setShowVideoPlayer ] = useState(true)
   const [ isBuffering, setIsBuffering ] = useState(true)
+  const [ playableDuration, setPlayableDuration ] = useState(0)
 
   const { video: { video_url, title } } = route.params
 
@@ -37,11 +38,14 @@ export default function({ route, navigation }) {
   const isCurrentlyClosingVideoPlayer = useRef()
   const seeking = useRef()
   const videoLoadedStatus = useRef(false)
+  const errorShown = useRef(false)
+  const progressBufferCountdown = useRef()
 
   videoDurationRef.current = videoDuration
   currentTimeRef.current = currentTime
 
   const onVideoBuffering = (buffer) => {
+
 
     if( videoPanActive ) return;
 
@@ -57,6 +61,9 @@ export default function({ route, navigation }) {
   }
 
   const videoError = (err) => {
+
+    if( errorShown.current ) return
+
     let errorDetails = null
     if( Platform.OS == 'ios' ) {
       const { error: { code, domain } } = err
@@ -64,9 +71,11 @@ export default function({ route, navigation }) {
     }
     else
     {
-      const { error: { extra } } = err
-      errorDetails = `Error ${extra}`
+      const { error: { errorString } } = err
+      errorDetails = `Error: ${errorString}`
     }
+
+    errorShown.current = true
 
     Alert.alert(
       'Terjadi kesalahan!',
@@ -74,7 +83,10 @@ export default function({ route, navigation }) {
       [
         {
           text: "Tutup",
-          onPress: () => navigation.goBack(),
+          onPress: () => {
+            errorShown.current = false
+            navigation.goBack()
+          },
           style: "cancel",
         },
       ]
@@ -112,7 +124,19 @@ export default function({ route, navigation }) {
   }
 
   const onVideoProgress = (meta) => {
+
+    if( isBuffering ) {
+      setIsBuffering(false)
+    }
+
     setCurrentTime(Math.ceil(meta.currentTime))
+
+    if( meta.playableDuration > 0 ) {
+      const playablePercent = Math.ceil(meta.playableDuration) / videoDuration * 100
+
+      setPlayableDuration(playablePercent)
+    }
+
 
     updateVideoPan()
   }
@@ -207,31 +231,26 @@ export default function({ route, navigation }) {
       ),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: () => {
-
-        if( resetOffsetRef.current > 0 ) {
-          const offsetToApply = resetOffsetRef.current + videoPan.x._value
-          videoPan.setValue({x: offsetToApply, y: videoPan.y})
-        }
+        videoPan.flattenOffset()
 
         setVideoPanActive(false)
         pauseVideo(false)
-        setIsBuffering(true)
+
 
         const offsetLimit = (hp(90) / hp(100) * hp(90))
-        const moveOffset = (videoPan.x._value > offsetLimit) ? offsetLimit : videoPan.x._value;
+        const moveOffset = videoPan.x._value;
         const progressPercent = moveOffset / offsetLimit * 100
         const progressToVideoTime = progressPercent / 100 * videoDurationRef.current
 
+        if( progressToVideoTime > playableDuration ) {
+          setIsBuffering(true)
+        }
+
         setCurrentTime(progressToVideoTime)
+
         player.current.seek(progressToVideoTime)
         videoPlayerControlTimeout.current = setTimeout(() => showPlayerControl(false), PLAYER_HIDE_TIMEOUT)
 
-        const position = (currentTimeRef.current / videoDurationRef.current * 100)
-        const positionOffset = position / 100 * (hp(90) / hp(100) * hp(90))
-        videoPan.setOffset({x: positionOffset - moveOffset})
-
-        panPosition.current = positionOffset
-        resetOffsetRef.current = positionOffset
       },
       onShouldBlockNativeResponder: (evt, gestureState) => {
         return true;
@@ -267,9 +286,10 @@ export default function({ route, navigation }) {
                   onEnd={closeVideoPlayer}
                   onProgress={onVideoProgress}
                   onAudioBecomingNoisy={() => pauseVideo(true)}
+                  progressUpdateInterval={1000}
                   paused={isPaused}
                   seekColor={ getColor('brand') }
-                  resizeMode="cover"
+                  resizeMode="contain"
                   volume={1}
                   style={[tailwind('absolute bottom-0 top-0 left-0 right-0 bg-brand-dark')]} />
           }
@@ -281,18 +301,23 @@ export default function({ route, navigation }) {
               <TouchableWithoutFeedback
                 onPress={() => togglePlayerControl()}>
                 <LinearGradient
-                  colors={[getColor('brand-dark'), getColor('brand-dark opacity-70'), getColor('brand-dark')]}
+                  colors={[getColor('brand-dark'), getColor('brand-dark opacity-40'), getColor('brand-dark')]}
                   style={[tailwind(' w-full flex  justify-between h-full')]}>
 
                     <View style={[  tailwind('flex flex-row items-center justify-between'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
-                      <Text style={ tailwind('text-white font-bold text-xl') }>{ title }</Text>
+                      <Text style={[ tailwind('text-white  text-lg'), {width: '80%'}]}>{ title }</Text>
                       <TouchableOpacity onPress={() => closeVideoPlayer()} activeOpacity={0.7}>
                         <View  style={[tailwind('rounded-full bg-brand-darker bg-opacity-50 w-7 h-7 flex items-center justify-center bg-transparent mr-2')]}>
                             <TimesIcon style={[tailwind('h-6 w-6 text-white opacity-70 bg-transparent')]} fill={getColor('transparent')}/>
                         </View>
                       </TouchableOpacity>
                     </View>
-                    <View style={[  tailwind('flex flex-row items-center justify-center'), { marginTop: hp(2.5), marginHorizontal: wp(10) }  ]}>
+                    <View style={[  tailwind('flex flex-row items-center justify-between w-full'), {  paddingHorizontal: wp(50) }  ]}>
+                      <TouchableOpacity
+                        activeOpacity={.6}
+                        hitSlop={{ bottom: 50, top: 50, left: 50, right: 50 }}
+                        disabled={isBuffering}
+                        onPress={() => player.current.seek(currentTime - 10)} ><BackwardIcon style={tailwind(`text-white h-8 w-8 ${isBuffering ? 'opacity-50' : ''}`)} /></TouchableOpacity>
                       {
                         isPaused
                           ? ( ! isBuffering && ! seeking.current && <TouchableWithoutFeedback onPress={() => pauseVideo(false)}><PlayButton style={tailwind('text-white h-10 w-10')} /></TouchableWithoutFeedback> )
@@ -301,14 +326,21 @@ export default function({ route, navigation }) {
                       {
                         isBuffering  && <ActivityIndicator size="large" color={getColor('white')}/>
                       }
+                      <TouchableOpacity
+                        activeOpacity={.6}
+                        hitSlop={{ bottom: 50, top: 50, left: 50, right: 50 }}
+                        disabled={isBuffering}
+                        onPress={() => player.current.seek(currentTime + 10)}><ForwardIcon style={tailwind(`text-white h-8 w-8 ${isBuffering ? 'opacity-50' : ''}`)} /></TouchableOpacity>
                     </View>
                     <View style={[  tailwind('flex items-center justify-between'), { marginBottom: hp(5), marginHorizontal: wp(10) } ]} >
                       <View style={[ tailwind('flex flex-row items-center justify-between'), {width: '100%'} ]}>
                         <View style={[ { width: '91%' } ]}>
                           <View style={[tailwind('absolute top-0 h-1 bg-white opacity-30 rounded-lg'), { width: '100%' }]} />
+                          <View style={[{ width: `${playableDuration}%` }, tailwind('absolute top-0 bg-white h-1 rounded-lg opacity-40') ]} />
                           <View style={[{ width: `${ currentTime / videoDuration * 100}%` }, tailwind('flex flex-row items-center justify-between absolute top-0 ') ]}>
                             <View style={[tailwind('h-1 bg-brand rounded-lg'), { width: '100%' }]} />
                             <Animated.View
+                              hitSlop={{ bottom: 15, top: 15, left: 25, right: 50 }}
                               style={[
                                 tailwind(`absolute  ${videoPanActive ? 'h-5 w-5' : 'h-4 w-4'} bg-brand rounded-full`), {
                                   transform: [

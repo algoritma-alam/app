@@ -25,7 +25,20 @@ export default function( { navigation } ) {
   const { _, getImageProps } = useResponsiveImageView({ source: recommendedVideo.thumbnailStatic });
 
   const windowHeight = hp(100)
-  const recommendedVideoHeight = ( windowHeight > 600 )  ? hp('75%') : hp('95%')
+  //const recommendedVideoHeight = ( windowHeight > 600 && windowHeight < 700 ) ? (windowHeight > 700 && windowHeight < 800) ? hp('90%') : hp('95%') : hp('70%')
+
+  let recommendedVideoHeight = hp(100)
+
+  if( windowHeight > 400 && windowHeight < 700 ) {
+    recommendedVideoHeight = hp(95)
+  }
+  else if(windowHeight > 700 && windowHeight < 800) {
+     recommendedVideoHeight = hp(80)
+  }
+  else
+  {
+     recommendedVideoHeight = hp(70)
+  }
 
   const categoriesToRender = categories
     .map(category => {

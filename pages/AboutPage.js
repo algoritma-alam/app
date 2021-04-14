@@ -111,10 +111,9 @@ export default function( { children, navigation } ) {
               <LinearGradient
                 colors={[getColor('brand-darker'), getColor('brand-dark opacity-50'), getColor('brand-dark')]}
                 style={[tailwind('absolute top-0  left-0 right-0 h-full w-full'), { height: hp(100) }]}>
-                    <SafeAreaView style={[tailwind(' w-full  flex  h-full justify-start  z-50 mt-11'), { height: hp(100), paddingHorizontal: wp(5), paddingVertical: hp(10) }]}>
+                    <SafeAreaView style={[tailwind(` w-full  flex  h-full justify-start  z-50 ${hp(100) > 700 ? 'mt-11' : ''}`), { height: hp(100), paddingHorizontal: wp(5), paddingVertical: ( hp(100) > 700 ) ? hp(10) : hp(4) }]}>
                         <FastImage source={AlgoritmaAlamLogo} style={tailwind('w-20 h-12')}/>
-
-                        <View style={[{ marginTop: hp(2) }]}>
+                        <View style={[{ marginTop: hp(1) }]}>
                           <Text style={[tailwind('text-white text-xl'), { fontFamily: Platform.OS == 'ios' ? 'Caveat' : 'caveat' }]}>
                             Kita semua kebetulan hidup pada jaman materialistis, manusia dituntut untuk mengikuti kebenaran menurut akal, atau yang kami sebut <Text style={tailwind('font-bold')}>"ilmu barat"</Text>
                           </Text>
@@ -136,10 +135,6 @@ export default function( { children, navigation } ) {
                           <Text style={[tailwind('text-white text-2xl'), { fontFamily: Platform.OS == 'ios' ? 'Caveat' : 'caveat' }]}>
                             - Algoritma Alam -
                           </Text>
-                        </View>
-
-                        <View style={[{ paddingHorizontal: wp(5), paddingBottom: hp(18) }, tailwind('absolute bottom-0 flex flex-row items-center justify-between  w-full')]}>
-                          <ArrowDown style={[tailwind('w-5 h-8 text-white mx-2 opacity-70')]}/>
                         </View>
 
                     </SafeAreaView>
